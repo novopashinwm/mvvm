@@ -1,27 +1,24 @@
 package com.elegion.test.behancer.ui.projects;
 
+import android.arch.paging.PagedListAdapter;
 import android.support.annotation.NonNull;
-import android.support.v7.widget.RecyclerView;
+import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 import com.elegion.test.behancer.data.model.project.RichProject;
 import com.elegion.test.behancer.databinding.ProjectBinding;
 
-import java.util.List;
-
 /**
  * Created by Vladislav Falzan.
  */
 
-public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
+public class ProjectsAdapter extends PagedListAdapter<RichProject, ProjectsHolder> {
 
-    @NonNull
-    private final List<RichProject> mProjects;
     private final OnItemClickListener mOnItemClickListener;
 
-    public ProjectsAdapter(List<RichProject> projects, OnItemClickListener onItemClickListener) {
-        mProjects = projects;
+    public ProjectsAdapter(OnItemClickListener onItemClickListener) {
+        super(CALLBACK);
         mOnItemClickListener = onItemClickListener;
     }
 
@@ -35,14 +32,23 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ProjectsHolder holder, int position) {
-        RichProject project = mProjects.get(position);
-        holder.bind(project, mOnItemClickListener);
+        RichProject project = getItem(position);
+        if (project != null) {
+            holder.bind(project, mOnItemClickListener);
+        }
     }
 
-    @Override
-    public int getItemCount() {
-        return mProjects == null ? 0 : mProjects.size();
-    }
+    private static final DiffUtil.ItemCallback<RichProject> CALLBACK = new DiffUtil.ItemCallback<RichProject>() {
+        @Override
+        public boolean areItemsTheSame(RichProject oldItem, RichProject newItem) {
+            return oldItem.mProject.getId() == newItem.mProject.getId();
+        }
+
+        @Override
+        public boolean areContentsTheSame(RichProject oldItem, RichProject newItem) {
+            return oldItem.equals(newItem);
+        }
+    };
 
     public interface OnItemClickListener {
 

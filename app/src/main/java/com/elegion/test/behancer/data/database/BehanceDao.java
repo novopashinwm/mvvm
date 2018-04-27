@@ -1,6 +1,7 @@
 package com.elegion.test.behancer.data.database;
 
 import android.arch.lifecycle.LiveData;
+import android.arch.paging.DataSource;
 import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
@@ -41,6 +42,9 @@ public interface BehanceDao {
 
     @Query("select * from project order by published_on desc")
     LiveData<List<RichProject>> getProjectsLive();
+
+    @Query("select * from project order by published_on desc")
+    DataSource.Factory<Integer, RichProject> getProjectsPaged();
 
     @Query("select * from owner where project_id = :projectId")
     List<Owner> getOwnersFromProject(int projectId);
