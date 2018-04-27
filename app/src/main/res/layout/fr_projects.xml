@@ -1,26 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v4.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/refresher"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
 
-    <FrameLayout
+    <data class="ProjectsBinding">
+
+        <import
+            alias="V"
+            type="android.view.View" />
+
+        <variable
+            name="vm"
+            type="com.elegion.test.behancer.ui.projects.ProjectsViewModel" />
+
+    </data>
+
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/refresher"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        bind:onRefresh="@{vm.onRefreshListener}"
+        bind:refreshState="@{vm.isLoading}">
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/recycler"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:visibility="visible" />
+            android:orientation="vertical">
 
-        <include
-            layout="@layout/v_error"
-            android:visibility="gone" />
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/recycler"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="@{vm.isErrorVisible ? V.GONE : V.VISIBLE}"
+                bind:clickHandler="@{vm.onItemClickListener}"
+                bind:data="@{vm.projects}" />
 
-    </FrameLayout>
+            <include
+                layout="@layout/v_error"
+                android:visibility="@{vm.isErrorVisible ? V.VISIBLE : V.GONE}" />
 
-</android.support.v4.widget.SwipeRefreshLayout>
+        </LinearLayout>
 
+    </android.support.v4.widget.SwipeRefreshLayout>
 
-
+</layout>
