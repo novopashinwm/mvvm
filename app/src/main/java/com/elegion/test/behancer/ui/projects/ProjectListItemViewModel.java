@@ -1,6 +1,6 @@
 package com.elegion.test.behancer.ui.projects;
 
-import com.elegion.test.behancer.data.model.project.Project;
+import com.elegion.test.behancer.data.model.project.RichProject;
 import com.elegion.test.behancer.utils.DateUtils;
 
 /**
@@ -15,11 +15,13 @@ public class ProjectListItemViewModel {
     private String mUsername;
     private String mPublishedOn;
 
-    public ProjectListItemViewModel(Project project) {
-        mImageUrl = project.getCover().getPhotoUrl();
-        mName = project.getName();
-        mUsername = project.getOwners().get(FIRST_OWNER_INDEX).getUsername();
-        mPublishedOn = DateUtils.format(project.getPublishedOn());
+    public ProjectListItemViewModel(RichProject item) {
+        mImageUrl = item.mProject.getCover().getPhotoUrl();
+        mName = item.mProject.getName();
+        mPublishedOn = DateUtils.format(item.mProject.getPublishedOn());
+        if (item.mOwners != null && item.mOwners.size() != 0) {
+            mUsername = item.mOwners.get(FIRST_OWNER_INDEX).getUsername();
+        }
     }
 
     public String getImageUrl() {

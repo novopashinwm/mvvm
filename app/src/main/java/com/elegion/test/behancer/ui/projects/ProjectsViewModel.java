@@ -1,18 +1,18 @@
 package com.elegion.test.behancer.ui.projects;
 
+import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.support.v4.widget.SwipeRefreshLayout;
 
 import com.elegion.test.behancer.BuildConfig;
 import com.elegion.test.behancer.data.Storage;
-import com.elegion.test.behancer.data.model.project.Project;
+import com.elegion.test.behancer.data.model.project.ProjectResponse;
+import com.elegion.test.behancer.data.model.project.RichProject;
 import com.elegion.test.behancer.utils.ApiUtils;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
@@ -27,31 +27,31 @@ public class ProjectsViewModel extends ViewModel {
     private ProjectsAdapter.OnItemClickListener mOnItemClickListener;
     private MutableLiveData<Boolean> mIsLoading = new MutableLiveData<>();
     private MutableLiveData<Boolean> mIsErrorVisible = new MutableLiveData<>();
-    private MutableLiveData<List<Project>> mProjects = new MutableLiveData<>();
-    private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = this::loadProjects;
+    private LiveData<List<RichProject>> mProjects;
+    private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = this::updateProjects;
 
     public ProjectsViewModel(Storage storage, ProjectsAdapter.OnItemClickListener onItemClickListener) {
         mStorage = storage;
         mOnItemClickListener = onItemClickListener;
-        mProjects.setValue(new ArrayList<>());
-        loadProjects();
+        mProjects = mStorage.getProjectsLive();
+        updateProjects();
     }
 
-    public void loadProjects() {
+    private void updateProjects() {
         mDisposable = ApiUtils.getApiService().getProjects(BuildConfig.API_QUERY)
-                .doOnSuccess(response -> mStorage.insertProjects(response))
-                .onErrorReturn(throwable ->
-                        ApiUtils.NETWORK_EXCEPTIONS.contains(throwable.getClass()) ? mStorage.getProjects() : null)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
+                .map(ProjectResponse::getProjects)
                 .doOnSubscribe(disposable -> mIsLoading.postValue(true))
                 .doFinally(() -> mIsLoading.postValue(false))
+                .doOnSuccess(response -> mIsErrorVisible.postValue(false))
+                .subscribeOn(Schedulers.io())
                 .subscribe(
-                        response -> {
-                            mIsErrorVisible.postValue(false);
-                            mProjects.postValue(response.getProjects());
-                        },
-                        throwable -> mIsErrorVisible.postValue(true));
+                        response -> mStorage.insertProjects(response),
+                        throwable -> {
+                            mIsErrorVisible.postValue(true);
+                            boolean value = mProjects.getValue() == null || mProjects.getValue().size() == 0;
+                            mIsErrorVisible.postValue(value);
+                        });
+
     }
 
     @Override
@@ -74,7 +74,7 @@ public class ProjectsViewModel extends ViewModel {
         return mIsErrorVisible;
     }
 
-    public MutableLiveData<List<Project>> getProjects() {
+    public LiveData<List<RichProject>> getProjects() {
         return mProjects;
     }
 

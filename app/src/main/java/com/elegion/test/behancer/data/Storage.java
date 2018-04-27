@@ -27,7 +27,11 @@ public class Storage {
     }
 
     public void insertProjects(ProjectResponse response) {
-        List<Project> projects = response.getProjects();
+        insertProjects(response.getProjects());
+
+    }
+
+    public void insertProjects(List<Project> projects) {
         mBehanceDao.insertProjects(projects);
 
         List<Owner> owners = getOwners(projects);
