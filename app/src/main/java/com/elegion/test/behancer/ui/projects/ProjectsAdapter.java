@@ -44,14 +44,6 @@ public class ProjectsAdapter extends RecyclerView.Adapter<ProjectsHolder> {
         return mProjects.size();
     }
 
-//    public void addData(List<Project> data, boolean isRefreshed) {
-//        if (isRefreshed) {
-//            mProjects.clear();
-//        }
-//
-//        mProjects.addAll(data);
-//        notifyDataSetChanged();
-//    }
 
     public interface OnItemClickListener {
 
