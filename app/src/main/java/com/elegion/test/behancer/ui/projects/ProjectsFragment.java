@@ -41,7 +41,7 @@ public class ProjectsFragment extends Fragment {
         super.onAttach(context);
         if (context instanceof Storage.StorageOwner) {
             Storage storage = ((Storage.StorageOwner) context).obtainStorage();
-            CustomFactory factory = new CustomFactory(storage, mOnItemClickListener);
+            CustomFactory factory = new CustomFactory(storage, mOnItemClickListener, null);
             mProjectsViewModel = ViewModelProviders.of(this, factory).get(ProjectsViewModel.class);
         }
     }
