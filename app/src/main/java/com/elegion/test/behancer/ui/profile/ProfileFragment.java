@@ -49,6 +49,7 @@ public class ProfileFragment extends Fragment {
         if (context instanceof Storage.StorageOwner) {
             Storage storage = ((Storage.StorageOwner) context).obtainStorage();
             mProfileViewModel = new ProfileViewModel(storage);
+
         }
     }
 
@@ -68,6 +69,7 @@ public class ProfileFragment extends Fragment {
 
         if (getArguments() != null) {
             username = getArguments().getString(PROFILE_KEY);
+            mProfileViewModel.setViewClickListener(mButtonListener);
         }
 
         if (getActivity() != null) {
@@ -82,5 +84,9 @@ public class ProfileFragment extends Fragment {
     public void onDetach() {
         mProfileViewModel.dispatchDetach();
         super.onDetach();
+    }
+
+    public View.OnClickListener getButtonListener() {
+        return mButtonListener;
     }
 }

@@ -4,6 +4,7 @@ import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.arch.paging.PagedList;
+import android.support.v4.widget.SwipeRefreshLayout;
 
 import com.elegion.test.behancer.data.Storage;
 import com.elegion.test.behancer.data.model.project.ProjectResponse;
@@ -21,10 +22,11 @@ public class UserProjectsViewModel extends ViewModel {
     private MutableLiveData<Boolean> mIsErrorVisible = new MutableLiveData<>();
     private LiveData<PagedList<RichProject>> mProjects;
     private MutableLiveData<String> mUser = new MutableLiveData<>();
+    private SwipeRefreshLayout.OnRefreshListener mOnRefreshListener = this::updateProjects;
 
     public UserProjectsViewModel(Storage storage, String user) {
         mStorage = storage;
-        mProjects = mStorage.getProjectsPaged();
+        mProjects = mStorage.getUserProjectsPaged(user);
         mUser.postValue(user);
         updateProjects();
     }
@@ -62,5 +64,9 @@ public class UserProjectsViewModel extends ViewModel {
 
     public MutableLiveData<String> getUser() {
         return mUser;
+    }
+
+    public SwipeRefreshLayout.OnRefreshListener getOnRefreshListener() {
+        return mOnRefreshListener;
     }
 }

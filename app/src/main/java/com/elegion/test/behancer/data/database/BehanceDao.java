@@ -46,6 +46,10 @@ public interface BehanceDao {
     @Query("select * from project order by published_on desc")
     DataSource.Factory<Integer, RichProject> getProjectsPaged();
 
+    @Query("select * from project t where t.id in (select o.project_id from owner o where o.username=:userName)  " +
+            " order by published_on desc")
+    DataSource.Factory<Integer, RichProject> getUserProjectsPaged(String userName);
+
     @Query("select * from owner where project_id = :projectId")
     List<Owner> getOwnersFromProject(int projectId);
 
